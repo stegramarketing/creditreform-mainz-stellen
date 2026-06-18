@@ -1,12 +1,10 @@
 {
-  "stand": "2026-06-18T09:04:03.747Z",
+  "stand": "2026-06-18T09:08:25.088Z",
   "stellen": {
     "ausbildung": {
       "offen": true,
       "standorte": [
-        "bad-kreuznach",
-        "mainz",
-        "worms"
+        "bad-kreuznach"
       ]
     },
     "refa": {
@@ -31,11 +29,13 @@
       "offen": true,
       "standorte": [
         "bad-kreuznach",
+        "kaiserslautern",
+        "mainz",
         "worms"
       ]
     },
     "aussendienst": {
-      "offen": true,
+      "offen": false,
       "standorte": [
         "bad-kreuznach",
         "kaiserslautern",
