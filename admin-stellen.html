@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Creditreform Mainz – Stellen-Steuerung</title>
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Mulish', sans-serif;
+    background: #F3F6FA;
+    color: #333;
+    min-height: 100vh;
+    padding: 24px 16px 60px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+
+  /* ── Login ── */
+  #login {
+    max-width: 420px; margin: 12vh auto 0; background: #fff;
+    border-radius: 16px; box-shadow: 0 8px 30px rgba(0,72,132,.12);
+    padding: 36px 32px; text-align: center;
+  }
+  #login h1 { font-size: 22px; font-weight: 900; color: #019EE2; margin-bottom: 6px; }
+  #login p { font-size: 14px; color: #666; margin-bottom: 22px; }
+  #login input {
+    width: 100%; font-family: 'Mulish', sans-serif; font-size: 16px;
+    padding: 13px 16px; border: 1.5px solid #D7DEE7; border-radius: 10px;
+    margin-bottom: 14px; outline: none; transition: border-color .2s;
+  }
+  #login input:focus { border-color: #019EE2; }
+  #loginError { color: #D23B3B; font-size: 13px; font-weight: 700; min-height: 18px; margin-bottom: 8px; }
+
+  .btn-primary {
+    display: inline-block; width: 100%; cursor: pointer;
+    font-family: 'Mulish', sans-serif; font-size: 15px; font-weight: 800; color: #fff;
+    background: linear-gradient(90deg, #5CD8F5 0%, #29B8E8 30%, #019EE2 70%, #0182C4 100%);
+    border: none; border-radius: 50px; padding: 14px 24px;
+    box-shadow: 0 3px 12px rgba(1,158,226,.25); transition: transform .15s, box-shadow .2s;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 5px 18px rgba(1,158,226,.4); }
+  .btn-primary:disabled { opacity: .55; cursor: default; transform: none; box-shadow: none; }
+
+  /* ── App ── */
+  #app { display: none; }
+  .head { margin-bottom: 22px; }
+  .head h1 { font-size: 26px; font-weight: 900; color: #019EE2; }
+  .head p { font-size: 14px; color: #555; margin-top: 6px; line-height: 1.5; }
+
+  .card {
+    background: #fff; border-radius: 14px; box-shadow: 0 2px 12px rgba(0,72,132,.08);
+    padding: 20px 22px; margin-bottom: 16px; border-left: 5px solid #019EE2;
+    transition: border-color .2s, opacity .2s;
+  }
+  .card.closed { border-left-color: #AEB4BE; opacity: .82; }
+
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
+  .card-title { font-size: 17px; font-weight: 800; color: #004884; line-height: 1.3; }
+  .card-sub { font-size: 12.5px; color: #888; margin-top: 2px; }
+
+  /* Toggle */
+  .toggle-wrap { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .toggle-label { font-size: 13px; font-weight: 800; color: #2BA84A; }
+  .toggle-label.off { color: #B33; }
+  .switch { position: relative; width: 52px; height: 28px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; inset: 0; cursor: pointer; background: #C9CED6;
+    border-radius: 28px; transition: background .2s;
+  }
+  .slider::before {
+    content: ''; position: absolute; height: 22px; width: 22px; left: 3px; top: 3px;
+    background: #fff; border-radius: 50%; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.25);
+  }
+  .switch input:checked + .slider { background: #2BA84A; }
+  .switch input:checked + .slider::before { transform: translateX(24px); }
+
+  /* Standorte */
+  .standorte { margin-top: 16px; padding-top: 16px; border-top: 1px dashed #E2E7EE; }
+  .standorte-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: #88909B; margin-bottom: 10px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 9px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 7px; cursor: pointer; user-select: none;
+    font-size: 13.5px; font-weight: 700; color: #004884; background: #ECEBE4;
+    border: 1.5px solid transparent; border-radius: 50px; padding: 7px 14px; transition: all .15s;
+  }
+  .chip input { display: none; }
+  .chip .dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #B6BEC8; flex-shrink: 0; transition: all .15s; }
+  .chip.active { background: #E3F4FC; border-color: #019EE2; color: #0172b8; }
+  .chip.active .dot { background: #019EE2; border-color: #019EE2; box-shadow: inset 0 0 0 2px #fff; }
+  .standorte.disabled { opacity: .45; pointer-events: none; }
+
+  /* Save bar */
+  .savebar { position: sticky; bottom: 0; background: #F3F6FA; padding: 16px 0 6px; margin-top: 8px; }
+  .save-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .save-row .btn-primary { width: auto; min-width: 220px; }
+  #status { font-size: 14px; font-weight: 700; }
+  #status.ok { color: #2BA84A; }
+  #status.err { color: #D23B3B; }
+  #status.load { color: #019EE2; }
+  .hint { font-size: 12px; color: #99A0AA; margin-top: 10px; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- ════════ LOGIN ════════ -->
+<div id="login">
+  <h1>Stellen-Steuerung</h1>
+  <p>Bitte Passwort eingeben, um die offenen Stellen zu verwalten.</p>
+  <input type="password" id="pw" placeholder="Passwort" autocomplete="off" />
+  <div id="loginError"></div>
+  <button class="btn-primary" id="loginBtn">Weiter</button>
+</div>
+
+<!-- ════════ APP ════════ -->
+<div id="app">
+  <div class="wrap">
+    <div class="head">
+      <h1>Offene Stellen verwalten</h1>
+      <p>Schalte Stellen an oder aus und wähle die offenen Standorte. Mit <strong>„Speichern &amp; absenden"</strong> wird alles übernommen – die Karriereseite aktualisiert sich automatisch und Steven bekommt eine E-Mail mit der neuen Übersicht.</p>
+    </div>
+
+    <div id="stellenListe"></div>
+
+    <div class="savebar">
+      <div class="save-row">
+        <button class="btn-primary" id="saveBtn">Speichern &amp; absenden</button>
+        <span id="status"></span>
+      </div>
+      <p class="hint">Hinweis: Nach dem Speichern kann es 1–2 Minuten dauern, bis die Änderung auf der Karriereseite sichtbar ist.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   KONFIGURATION  –  zwei URLs eintragen
+   ════════════════════════════════════════════════════════════════ */
+var CONFIG = {
+  // URL deiner stellen.json (GitHub Pages):
+  jsonUrl: "{{JSON_URL}}",
+  // Make-Webhook-URL (wird beim Speichern angesprochen):
+  webhookUrl: "{{WEBHOOK_URL}}",
+  // Passwort für den Zugang:
+  passwort: "Stegra"
+};
+
+/* Stellen + jeweils MÖGLICHE Standorte (= welche Häkchen auswählbar sind).
+   Default: alle 5. Bei Bedarf pro Stelle einschränken. */
+var ALLE_STANDORTE = [
+  { id: "bad-kreuznach",  name: "Bad Kreuznach" },
+  { id: "kaiserslautern", name: "Kaiserslautern" },
+  { id: "mainz",          name: "Mainz" },
+  { id: "neustadt",       name: "Neustadt a.d.W." },
+  { id: "worms",          name: "Worms" }
+];
+
+var STELLEN = [
+  { id: "ausbildung",          titel: "Ausbildung Kaufmann/-frau für Büromanagement (m/w/d)", sub: "Ausbildung für 2027",            verfuegbar: ["bad-kreuznach","mainz","worms"] },
+  { id: "refa",                titel: "Rechtsanwaltsfachangestellte (m/w/d)",                 sub: "Team Inkasso / Forderungsmanagement", verfuegbar: ["bad-kreuznach","mainz","neustadt","worms"] },
+  { id: "wirtschaftsauskuenfte", titel: "Mitarbeiter Wirtschaftsauskünfte (m/w/d)",           sub: "Team Auskunft",                  verfuegbar: ["bad-kreuznach","mainz","neustadt","worms"] },
+  { id: "vertriebsinnendienst", titel: "Kundenberater im Vertriebsinnendienst (m/w/d)",       sub: "Team Innendienst",               verfuegbar: ["bad-kreuznach","kaiserslautern","mainz","neustadt","worms"] },
+  { id: "aussendienst",        titel: "Kundenberater im Außendienst (m/w/d)",                 sub: "Team Außendienst",               verfuegbar: ["bad-kreuznach","kaiserslautern","mainz","neustadt","worms"] }
+];
+
+/* aktueller Zustand (wird aus stellen.json geladen) */
+var state = {};
+
+/* ── Login ── */
+var loginEl = document.getElementById("login");
+var appEl = document.getElementById("app");
+var pwInput = document.getElementById("pw");
+
+function doLogin() {
+  if (pwInput.value === CONFIG.passwort) {
+    loginEl.style.display = "none";
+    appEl.style.display = "block";
+    ladeDaten();
+  } else {
+    document.getElementById("loginError").textContent = "Falsches Passwort.";
+    pwInput.value = "";
+    pwInput.focus();
+  }
+}
+document.getElementById("loginBtn").addEventListener("click", doLogin);
+pwInput.addEventListener("keydown", function (e) { if (e.key === "Enter") doLogin(); });
+
+/* ── Daten laden ── */
+function standardState() {
+  var s = {};
+  STELLEN.forEach(function (st) {
+    s[st.id] = { offen: true, standorte: st.verfuegbar.slice() };
+  });
+  return s;
+}
+
+function ladeDaten() {
+  setStatus("Lade aktuellen Stand …", "load");
+  if (!CONFIG.jsonUrl || CONFIG.jsonUrl.indexOf("{{") === 0) {
+    state = standardState();
+    render();
+    setStatus("", "");
+    return;
+  }
+  var url = CONFIG.jsonUrl + (CONFIG.jsonUrl.indexOf("?") === -1 ? "?" : "&") + "t=" + Date.now();
+  fetch(url, { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (data) {
+      state = (data && data.stellen) ? data.stellen : standardState();
+      // fehlende Stellen ergänzen
+      STELLEN.forEach(function (st) {
+        if (!state[st.id]) state[st.id] = { offen: true, standorte: st.verfuegbar.slice() };
+      });
+      render();
+      setStatus("", "");
+    })
+    .catch(function () {
+      state = standardState();
+      render();
+      setStatus("Konnte aktuellen Stand nicht laden – Standard angezeigt.", "err");
+    });
+}
+
+/* ── Rendern ── */
+function render() {
+  var box = document.getElementById("stellenListe");
+  box.innerHTML = "";
+  STELLEN.forEach(function (st) {
+    var s = state[st.id];
+    var offen = s.offen !== false;
+
+    var card = document.createElement("div");
+    card.className = "card" + (offen ? "" : " closed");
+    card.setAttribute("data-id", st.id);
+
+    var chips = st.verfuegbar.map(function (locId) {
+      var loc = ALLE_STANDORTE.filter(function (l) { return l.id === locId; })[0];
+      var on = s.standorte && s.standorte.indexOf(locId) !== -1;
+      return '<label class="chip' + (on ? ' active' : '') + '" data-loc="' + locId + '">' +
+               '<span class="dot"></span>' + loc.name +
+               '<input type="checkbox" ' + (on ? 'checked' : '') + ' />' +
+             '</label>';
+    }).join("");
+
+    card.innerHTML =
+      '<div class="card-top">' +
+        '<div><div class="card-title">' + st.titel + '</div><div class="card-sub">' + st.sub + '</div></div>' +
+        '<div class="toggle-wrap">' +
+          '<span class="toggle-label' + (offen ? '' : ' off') + '">' + (offen ? 'Offen' : 'Geschlossen') + '</span>' +
+          '<label class="switch"><input type="checkbox" class="js-offen" ' + (offen ? 'checked' : '') + ' /><span class="slider"></span></label>' +
+        '</div>' +
+      '</div>' +
+      '<div class="standorte' + (offen ? '' : ' disabled') + '">' +
+        '<div class="standorte-label">Offene Standorte</div>' +
+        '<div class="chips">' + chips + '</div>' +
+      '</div>';
+
+    box.appendChild(card);
+
+    // Toggle-Handler
+    var offenInput = card.querySelector(".js-offen");
+    offenInput.addEventListener("change", function () {
+      s.offen = offenInput.checked;
+      render();
+    });
+
+    // Chip-Handler
+    card.querySelectorAll(".chip").forEach(function (chip) {
+      chip.addEventListener("click", function (e) {
+        e.preventDefault();
+        var locId = chip.getAttribute("data-loc");
+        var idx = s.standorte ? s.standorte.indexOf(locId) : -1;
+        if (idx === -1) {
+          if (!s.standorte) s.standorte = [];
+          s.standorte.push(locId);
+        } else {
+          s.standorte.splice(idx, 1);
+        }
+        render();
+      });
+    });
+  });
+}
+
+/* ── Status ── */
+function setStatus(txt, cls) {
+  var el = document.getElementById("status");
+  el.textContent = txt;
+  el.className = cls || "";
+}
+
+/* ── Speichern ── */
+document.getElementById("saveBtn").addEventListener("click", function () {
+  var btn = this;
+  // Standorte säubern (nur verfügbare behalten, sortiert)
+  var payloadStellen = {};
+  STELLEN.forEach(function (st) {
+    var s = state[st.id];
+    var standorte = (s.standorte || []).filter(function (loc) {
+      return st.verfuegbar.indexOf(loc) !== -1;
+    });
+    // in der definierten Reihenfolge sortieren
+    standorte.sort(function (a, b) { return st.verfuegbar.indexOf(a) - st.verfuegbar.indexOf(b); });
+    payloadStellen[st.id] = { offen: s.offen !== false, standorte: standorte };
+  });
+
+  var payload = { stand: new Date().toISOString(), stellen: payloadStellen };
+
+  if (!CONFIG.webhookUrl || CONFIG.webhookUrl.indexOf("{{") === 0) {
+    setStatus("Webhook noch nicht konfiguriert (Make-URL fehlt).", "err");
+    return;
+  }
+
+  btn.disabled = true;
+  setStatus("Wird gespeichert …", "load");
+
+  fetch(CONFIG.webhookUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+    .then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      setStatus("✓ Gespeichert! Die Karriereseite wird in Kürze aktualisiert.", "ok");
+    })
+    .catch(function () {
+      setStatus("Fehler beim Speichern. Bitte erneut versuchen.", "err");
+    })
+    .then(function () { btn.disabled = false; });
+});
+</script>
+</body>
+</html>
