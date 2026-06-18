@@ -140,9 +140,9 @@
    ════════════════════════════════════════════════════════════════ */
 var CONFIG = {
   // URL deiner stellen.json (GitHub Pages):
-  jsonUrl: "{{JSON_URL}}",
+  jsonUrl: "https://stegramarketing.github.io/creditreform-mainz-stellen/stellen.json",
   // Make-Webhook-URL (wird beim Speichern angesprochen):
-  webhookUrl: "{{WEBHOOK_URL}}",
+  webhookUrl: "https://hook.eu1.make.com/jl20ek9k4ww62by9chzh5tx4m1efr3ix",
   // Passwort für den Zugang:
   passwort: "Stegra"
 };
@@ -306,7 +306,51 @@ document.getElementById("saveBtn").addEventListener("click", function () {
     payloadStellen[st.id] = { offen: s.offen !== false, standorte: standorte };
   });
 
-  var payload = { stand: new Date().toISOString(), stellen: payloadStellen };
+  var stand = new Date().toISOString();
+  var standDe = new Date().toLocaleString("de-DE");
+
+  // Exakter Datei-Inhalt für stellen.json (so wird die Datei auf GitHub geschrieben)
+  var dateiInhalt = JSON.stringify({ stand: stand, stellen: payloadStellen }, null, 2);
+
+  // Menschlich lesbare Übersicht für Stevens E-Mail
+  var zeilenText = [], zeilenHtml = [];
+  STELLEN.forEach(function (st) {
+    var s = payloadStellen[st.id];
+    var status = s.offen ? "OFFEN" : "GESCHLOSSEN";
+    var orte = s.standorte.length
+      ? s.standorte.map(function (k) {
+          var l = ALLE_STANDORTE.filter(function (x) { return x.id === k; })[0];
+          return l ? l.name : k;
+        }).join(", ")
+      : "—";
+    zeilenText.push("• " + st.titel + ": " + status + (s.offen ? " — " + orte : ""));
+    zeilenHtml.push(
+      "<tr>" +
+      "<td style='padding:8px 12px;border-bottom:1px solid #eee;'>" + st.titel + "</td>" +
+      "<td style='padding:8px 12px;border-bottom:1px solid #eee;font-weight:700;color:" + (s.offen ? "#1C7E38" : "#C0392B") + ";'>" + status + "</td>" +
+      "<td style='padding:8px 12px;border-bottom:1px solid #eee;'>" + (s.offen ? orte : "—") + "</td>" +
+      "</tr>"
+    );
+  });
+  var uebersichtText = "Stellen-Update Creditreform Mainz\nStand: " + standDe + "\n\n" + zeilenText.join("\n");
+  var uebersichtHtml =
+    "<div style=\"font-family:Arial,sans-serif;color:#333;\">" +
+    "<h2 style=\"color:#019EE2;margin:0 0 4px;\">Stellen-Update Creditreform Mainz</h2>" +
+    "<p style=\"margin:0 0 16px;color:#666;\">Stand: " + standDe + "</p>" +
+    "<table style=\"border-collapse:collapse;font-size:14px;width:100%;max-width:560px;\">" +
+    "<tr style=\"background:#F0F7FC;\"><th style=\"text-align:left;padding:8px 12px;\">Stelle</th><th style=\"text-align:left;padding:8px 12px;\">Status</th><th style=\"text-align:left;padding:8px 12px;\">Offene Standorte</th></tr>" +
+    zeilenHtml.join("") +
+    "</table>" +
+    "<p style=\"margin:16px 0 0;color:#888;font-size:12px;\">Bitte das Bewerbungsformular entsprechend anpassen.</p>" +
+    "</div>";
+
+  var payload = {
+    stand: stand,
+    dateiInhalt: dateiInhalt,
+    uebersichtText: uebersichtText,
+    uebersichtHtml: uebersichtHtml,
+    stellen: payloadStellen
+  };
 
   if (!CONFIG.webhookUrl || CONFIG.webhookUrl.indexOf("{{") === 0) {
     setStatus("Webhook noch nicht konfiguriert (Make-URL fehlt).", "err");
