@@ -1,5 +1,5 @@
 {
-  "stand": "2026-06-18T13:16:41.231Z",
+  "stand": "2026-06-18T13:18:38.563Z",
   "stellen": {
     "ausbildung": {
       "offen": false,
@@ -28,7 +28,7 @@
       ]
     },
     "vertriebsinnendienst": {
-      "offen": true,
+      "offen": false,
       "standorte": [
         "bad-kreuznach"
       ]
