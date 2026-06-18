@@ -167,6 +167,8 @@ var STELLEN = [
 
 /* aktueller Zustand (wird aus stellen.json geladen) */
 var state = {};
+var originalState = {};
+function merkeOriginal() { originalState = JSON.parse(JSON.stringify(state)); }
 
 /* ── Login ── */
 var loginEl = document.getElementById("login");
@@ -200,6 +202,7 @@ function ladeDaten() {
   setStatus("Lade aktuellen Stand …", "load");
   if (!CONFIG.jsonUrl || CONFIG.jsonUrl.indexOf("{{") === 0) {
     state = standardState();
+    merkeOriginal();
     render();
     setStatus("", "");
     return;
@@ -213,11 +216,13 @@ function ladeDaten() {
       STELLEN.forEach(function (st) {
         if (!state[st.id]) state[st.id] = { offen: true, standorte: st.verfuegbar.slice() };
       });
+      merkeOriginal();
       render();
       setStatus("", "");
     })
     .catch(function () {
       state = standardState();
+      merkeOriginal();
       render();
       setStatus("Konnte aktuellen Stand nicht laden – Standard angezeigt.", "err");
     });
@@ -312,6 +317,47 @@ document.getElementById("saveBtn").addEventListener("click", function () {
   // Exakter Datei-Inhalt für stellen.json (so wird die Datei auf GitHub geschrieben)
   var dateiInhalt = JSON.stringify({ stand: stand, stellen: payloadStellen }, null, 2);
 
+  function ortNamen(arr) {
+    return (arr && arr.length)
+      ? arr.map(function (k) {
+          var l = ALLE_STANDORTE.filter(function (x) { return x.id === k; })[0];
+          return l ? l.name : k;
+        }).join(", ")
+      : "—";
+  }
+
+  // ── Vorher/Nachher-Vergleich (Stand beim Öffnen vs. jetzt) ──
+  var aenderungText = [], aenderungHtml = [];
+  STELLEN.forEach(function (st) {
+    var alt = originalState[st.id] || { offen: true, standorte: [] };
+    var neu = payloadStellen[st.id];
+    var altOffen = alt.offen !== false, neuOffen = neu.offen !== false;
+
+    if (altOffen !== neuOffen) {
+      var von = altOffen ? "OFFEN" : "GESCHLOSSEN";
+      var zu = neuOffen ? "OFFEN" : "GESCHLOSSEN";
+      aenderungText.push("• " + st.titel + ": " + von + " → " + zu);
+      aenderungHtml.push("<li><strong>" + st.titel + ":</strong> " + von + " &rarr; <strong>" + zu + "</strong></li>");
+    }
+
+    var altOrte = (alt.standorte || []).slice().sort().join(",");
+    var neuOrte = (neu.standorte || []).slice().sort().join(",");
+    if ((altOffen || neuOffen) && altOrte !== neuOrte) {
+      aenderungText.push("• " + st.titel + " – Standorte: " + ortNamen(alt.standorte) + " → " + ortNamen(neu.standorte));
+      aenderungHtml.push("<li><strong>" + st.titel + "</strong> – Standorte: " + ortNamen(alt.standorte) + " &rarr; <strong>" + ortNamen(neu.standorte) + "</strong></li>");
+    }
+  });
+  var keineAenderung = aenderungHtml.length === 0;
+  var aenderungBlockText = keineAenderung
+    ? "Keine Änderungen gegenüber dem vorherigen Stand."
+    : "ÄNDERUNGEN:\n" + aenderungText.join("\n");
+  var aenderungBlockHtml = keineAenderung
+    ? "<p style=\"margin:0 0 16px;color:#777;\"><em>Keine Änderungen gegenüber dem vorherigen Stand.</em></p>"
+    : "<div style=\"margin:0 0 18px;padding:12px 16px;background:#FFF7E6;border-left:4px solid #E0A23B;border-radius:6px;\">" +
+        "<div style=\"font-weight:700;color:#A86B12;margin-bottom:6px;\">Änderungen</div>" +
+        "<ul style=\"margin:0;padding-left:20px;color:#333;line-height:1.6;\">" + aenderungHtml.join("") + "</ul>" +
+      "</div>";
+
   // Menschlich lesbare Übersicht für Stevens E-Mail
   var zeilenText = [], zeilenHtml = [];
   STELLEN.forEach(function (st) {
@@ -332,11 +378,13 @@ document.getElementById("saveBtn").addEventListener("click", function () {
       "</tr>"
     );
   });
-  var uebersichtText = "Stellen-Update Creditreform Mainz\nStand: " + standDe + "\n\n" + zeilenText.join("\n");
+  var uebersichtText = "Stellen-Update Creditreform Mainz\nStand: " + standDe + "\n\n" + aenderungBlockText + "\n\nAKTUELLER STAND:\n" + zeilenText.join("\n");
   var uebersichtHtml =
     "<div style=\"font-family:Arial,sans-serif;color:#333;\">" +
     "<h2 style=\"color:#019EE2;margin:0 0 4px;\">Stellen-Update Creditreform Mainz</h2>" +
     "<p style=\"margin:0 0 16px;color:#666;\">Stand: " + standDe + "</p>" +
+    aenderungBlockHtml +
+    "<div style=\"font-weight:700;color:#004884;margin:0 0 8px;\">Aktueller Stand</div>" +
     "<table style=\"border-collapse:collapse;font-size:14px;width:100%;max-width:560px;\">" +
     "<tr style=\"background:#F0F7FC;\"><th style=\"text-align:left;padding:8px 12px;\">Stelle</th><th style=\"text-align:left;padding:8px 12px;\">Status</th><th style=\"text-align:left;padding:8px 12px;\">Offene Standorte</th></tr>" +
     zeilenHtml.join("") +
@@ -368,6 +416,7 @@ document.getElementById("saveBtn").addEventListener("click", function () {
     .then(function (r) {
       if (!r.ok) throw new Error("HTTP " + r.status);
       setStatus("✓ Gespeichert! Die Karriereseite wird in Kürze aktualisiert.", "ok");
+      merkeOriginal(); // neuer "Vorher"-Stand für das nächste Speichern
     })
     .catch(function () {
       setStatus("Fehler beim Speichern. Bitte erneut versuchen.", "err");
