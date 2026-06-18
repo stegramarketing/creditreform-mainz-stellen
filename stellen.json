@@ -1,5 +1,5 @@
 {
-  "stand": "2026-06-18T11:56:42.721Z",
+  "stand": "2026-06-18T11:57:47.823Z",
   "stellen": {
     "ausbildung": {
       "offen": false,
@@ -10,7 +10,7 @@
       ]
     },
     "refa": {
-      "offen": false,
+      "offen": true,
       "standorte": [
         "bad-kreuznach",
         "mainz",
@@ -19,7 +19,7 @@
       ]
     },
     "wirtschaftsauskuenfte": {
-      "offen": false,
+      "offen": true,
       "standorte": [
         "bad-kreuznach",
         "mainz",
