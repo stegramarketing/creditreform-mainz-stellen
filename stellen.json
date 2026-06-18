@@ -1,5 +1,5 @@
 {
-  "stand": "2026-06-18T13:20:20.513Z",
+  "stand": "2026-06-18T13:29:40.115Z",
   "stellen": {
     "ausbildung": {
       "offen": false,
@@ -30,11 +30,7 @@
     "vertriebsinnendienst": {
       "offen": true,
       "standorte": [
-        "bad-kreuznach",
-        "kaiserslautern",
-        "mainz",
-        "neustadt",
-        "worms"
+        "bad-kreuznach"
       ]
     },
     "aussendienst": {
