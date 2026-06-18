@@ -1,5 +1,5 @@
 {
-  "stand": "2026-06-18T13:18:38.563Z",
+  "stand": "2026-06-18T13:18:47.115Z",
   "stellen": {
     "ausbildung": {
       "offen": false,
@@ -34,7 +34,7 @@
       ]
     },
     "aussendienst": {
-      "offen": false,
+      "offen": true,
       "standorte": [
         "bad-kreuznach",
         "kaiserslautern",
