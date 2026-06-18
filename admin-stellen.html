@@ -207,7 +207,7 @@ function ladeDaten() {
     setStatus("", "");
     return;
   }
-  var url = CONFIG.jsonUrl + (CONFIG.jsonUrl.indexOf("?") === -1 ? "?" : "&") + "t=" + Date.now();
+  var url = CONFIG.jsonUrl;
   fetch(url, { cache: "no-store" })
     .then(function (r) { return r.ok ? r.json() : null; })
     .then(function (data) {
