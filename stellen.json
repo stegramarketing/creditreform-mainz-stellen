@@ -1,37 +1,49 @@
 {
-  "stand": "2026-06-18T09:38:45.291Z",
+  "stand": "2026-06-18T09:48:08.329Z",
   "stellen": {
     "ausbildung": {
-      "offen": false,
+      "offen": true,
       "standorte": [
-        "bad-kreuznach"
+        "bad-kreuznach",
+        "mainz",
+        "worms"
       ]
     },
     "refa": {
       "offen": true,
       "standorte": [
         "bad-kreuznach",
-        "mainz"
+        "mainz",
+        "neustadt",
+        "worms"
       ]
     },
     "wirtschaftsauskuenfte": {
       "offen": true,
       "standorte": [
         "bad-kreuznach",
+        "mainz",
+        "neustadt",
         "worms"
       ]
     },
     "vertriebsinnendienst": {
       "offen": true,
       "standorte": [
-        "bad-kreuznach"
+        "bad-kreuznach",
+        "kaiserslautern",
+        "mainz",
+        "neustadt",
+        "worms"
       ]
     },
     "aussendienst": {
-      "offen": false,
+      "offen": true,
       "standorte": [
         "bad-kreuznach",
         "kaiserslautern",
+        "mainz",
+        "neustadt",
         "worms"
       ]
     }
