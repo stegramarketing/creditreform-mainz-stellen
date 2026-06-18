@@ -1,8 +1,8 @@
 {
-  "stand": "2026-06-18T09:08:25.088Z",
+  "stand": "2026-06-18T09:10:47.967Z",
   "stellen": {
     "ausbildung": {
-      "offen": true,
+      "offen": false,
       "standorte": [
         "bad-kreuznach"
       ]
@@ -26,7 +26,7 @@
       ]
     },
     "vertriebsinnendienst": {
-      "offen": true,
+      "offen": false,
       "standorte": [
         "bad-kreuznach",
         "kaiserslautern",
